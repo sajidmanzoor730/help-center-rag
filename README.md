@@ -1,4 +1,4 @@
-Help Center RAG
+###Help Center RAG
 
 Retrieval-Augmented Generation for Help Center Knowledge
 

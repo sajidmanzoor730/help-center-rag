@@ -1,75 +1,151 @@
 Help Center RAG
 
-A domain-specific Retrieval-Augmented Generation (RAG) project for searching help-center content and generating answers from retrieved context.
+Retrieval-Augmented Generation for Help Center Knowledge
 
-The project combines Python, semantic embeddings, FAISS vector search, and Gemini to explore how retrieval can improve the relevance and grounding of LLM-generated responses.
+Python · FAISS · Sentence Transformers · Gemini · Semantic Search · LLMs
 
----
-
-Overview
-
-Large language models can generate plausible answers even when they do not have the right source information.
-
-This project uses a retrieval-first approach:
-
-User question → semantic retrieval → relevant context → LLM response
-
-Instead of relying only on the model's internal knowledge, the system retrieves relevant documents and uses that context when generating an answer.
+A domain-specific RAG project that retrieves relevant help-center information and uses that context to generate more grounded answers.
 
 ---
 
-How It Works
+🎯 Project Overview
 
-User Question
-      │
-      ▼
-Text Embedding
-      │
-      ▼
-FAISS Similarity Search
-      │
-      ▼
-Relevant Documents
-      │
-      ▼
-Context Selection
-      │
-      ▼
-Gemini
-      │
-      ▼
-Grounded Answer
+Large language models can generate plausible answers even when they don't have access to the right source information.
 
-Retrieval
+This project explores a retrieval-first approach:
 
-The project uses:
+«User Question → Semantic Retrieval → Relevant Context → LLM Response»
 
-- Sentence Transformers for text embeddings
-- FAISS for vector similarity search
-- Top-k retrieval to identify relevant documents
-- Similarity-based filtering to improve context selection
-
-Generation
-
-Retrieved context is passed to the language model as supporting information before generating the final response.
-
-This separates the retrieval problem from the generation problem, making it easier to evaluate where an incorrect answer originates.
+The goal is to connect generated answers to a defined knowledge source instead of relying entirely on the model's internal knowledge.
 
 ---
 
-Technical Approach
+🔍 How It Works
 
-Component| Technology
+┌─────────────────────┐
+│    User Question    │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   Text Embedding    │
+│ Sentence Transformers│
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   FAISS Retrieval   │
+│  Similarity Search  │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ Relevant Documents  │
+│    Top-K Results    │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   Context + Prompt  │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│       Gemini        │
+│   Answer Generation │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   Grounded Answer   │
+└─────────────────────┘
+
+---
+
+🧠 Core Components
+
+Semantic Embeddings
+
+User questions and knowledge-base content are converted into numerical vector representations using Sentence Transformers.
+
+This allows the system to search for information based on meaning rather than exact keyword matches.
+
+FAISS Vector Search
+
+FAISS is used to perform similarity search over the generated embeddings.
+
+The system retrieves the most relevant documents for a given question before generating an answer.
+
+LLM Generation
+
+The retrieved context is provided to Gemini as supporting information.
+
+This creates a separation between:
+
+Retrieval → finding relevant information
+
+Generation → producing the final response
+
+---
+
+🏗️ Architecture
+
+                 ┌───────────────┐
+                 │  Knowledge    │
+                 │     Base      │
+                 └───────┬───────┘
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │   Embedding   │
+                 │    Model      │
+                 └───────┬───────┘
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │     FAISS     │
+                 │ Vector Index  │
+                 └───────┬───────┘
+                         │
+                         │
+User Query ──────────────┘
+      │
+      ▼
+┌───────────────┐
+│  Similarity   │
+│    Search     │
+└───────┬───────┘
+        │
+        ▼
+┌───────────────┐
+│   Retrieved   │
+│    Context    │
+└───────┬───────┘
+        │
+        ▼
+┌───────────────┐
+│    Gemini     │
+│      LLM      │
+└───────┬───────┘
+        │
+        ▼
+     Answer
+
+---
+
+🛠️ Technology Stack
+
+Area| Technology
 Language| Python
 Embeddings| Sentence Transformers
-Vector Search| FAISS
-LLM| Google Gemini / Vertex AI
-Retrieval| Semantic similarity search
-Configuration| "requirements.txt"
+Vector Database| FAISS
+LLM| Google Gemini
+Search| Semantic Similarity
+AI Pattern| Retrieval-Augmented Generation
 
 ---
 
-Project Structure
+📁 Project Structure
 
 help-center-rag/
 │
@@ -77,113 +153,121 @@ help-center-rag/
 ├── requirements.txt
 └── README.md
 
-"rag.py" contains the main RAG implementation.
-
-"requirements.txt" contains the Python dependencies required by the project.
-
----
-
-Why RAG?
-
-A traditional LLM workflow looks like:
-
-Question → LLM → Answer
-
-A RAG workflow adds a retrieval step:
-
-Question
-   ↓
-Retrieve relevant information
-   ↓
-Provide retrieved context to LLM
-   ↓
-Generate answer
-
-This approach is particularly useful for support and knowledge-base applications where answers should be based on a defined information source.
+File| Purpose
+"rag.py"| Main RAG implementation
+"requirements.txt"| Python dependencies
+"README.md"| Project documentation
 
 ---
 
-Evaluation
+🔄 RAG Pipeline
 
-The project can be evaluated across two separate areas:
+The system follows five main stages:
 
-Retrieval quality
+01 — Query
 
-Questions to evaluate include:
+The user submits a natural-language question.
 
-- Did the system retrieve the correct document?
-- Were the most relevant documents ranked highly?
+02 — Embedding
+
+The question is converted into an embedding using a sentence-transformer model.
+
+03 — Retrieval
+
+FAISS searches the vector index for semantically similar content.
+
+04 — Context Construction
+
+The most relevant retrieved information is selected as context.
+
+05 — Generation
+
+Gemini receives the question and retrieved context and generates the final response.
+
+---
+
+📊 Evaluation
+
+A RAG system needs to be evaluated at two different levels.
+
+Retrieval Quality
+
+Key questions include:
+
+- Did the system retrieve the relevant document?
+- Were relevant results ranked highly?
 - How much irrelevant context was returned?
 - How consistent was retrieval across different queries?
 
-Answer quality
+Answer Quality
 
-Generated answers can then be evaluated for:
+Generated responses can be evaluated for:
 
 - Relevance
-- Grounding in retrieved context
+- Grounding
 - Completeness
 - Unsupported claims
 - Hallucination
 
-Any performance measurements should be interpreted together with the evaluation dataset and methodology rather than as universal production benchmarks.
+Performance numbers should always be interpreted together with the dataset and evaluation methodology used to produce them.
 
 ---
 
-What I Learned
+💡 What This Project Demonstrates
 
-This project helped me work through several practical RAG concepts:
+This project demonstrates practical experience with:
 
-- Creating semantic representations of text
-- Vector similarity search with FAISS
-- Separating retrieval from generation
-- Selecting useful context for an LLM
-- Designing prompts around retrieved information
-- Thinking about retrieval quality separately from answer quality
-- Evaluating AI systems instead of relying only on subjective output quality
+- Python-based data processing
+- Semantic search
+- Vector embeddings
+- FAISS similarity search
+- Retrieval-Augmented Generation
+- LLM integration
+- Context selection
+- AI system evaluation
+- Knowledge-base search
 
 ---
 
-Limitations
+⚠️ Current Limitations
 
-This repository is primarily a focused RAG implementation rather than a production deployment.
+This repository is a focused implementation of the RAG workflow rather than a production deployment.
 
 Current limitations include:
 
 - No production-scale infrastructure
 - No persistent production vector database
-- No authentication or access-control layer
-- Evaluation depends on the available test/evaluation data
-- Retrieval quality is dependent on document quality and embedding performance
-
-These limitations are intentional: the project focuses on understanding and demonstrating the core retrieval-and-generation workflow.
+- No authentication or authorization layer
+- Evaluation depends on the available evaluation data
+- Retrieval quality depends on document quality and embedding performance
 
 ---
 
-Future Improvements
+🚀 Future Improvements
 
-Possible next steps include:
+Potential improvements include:
 
-- Add a dedicated document ingestion pipeline
-- Add a larger evaluation dataset
-- Compare multiple embedding models
-- Add retrieval evaluation metrics
-- Add automated hallucination/grounding checks
-- Add a web interface
-- Add API endpoints
-- Add experiment tracking
-- Add automated tests and CI
-
----
-
-Key Technologies
-
-Python · Retrieval-Augmented Generation · FAISS · Sentence Transformers · Semantic Search · Embeddings · Gemini · LLMs · Information Retrieval
+- [ ] Dedicated document ingestion pipeline
+- [ ] Larger evaluation dataset
+- [ ] Retrieval evaluation metrics
+- [ ] Embedding-model comparison
+- [ ] Automated grounding checks
+- [ ] Web interface
+- [ ] REST API
+- [ ] Automated testing
+- [ ] CI/CD pipeline
+- [ ] Experiment tracking
 
 ---
 
-Project Goal
+🎯 Project Goal
 
-The goal of this project is to understand how retrieval can make LLM-based support systems more useful by connecting generated responses to a defined knowledge source.
+The goal is to explore how retrieval can improve LLM-based knowledge systems by connecting generated responses to relevant source information.
 
-It is part of my broader work exploring data, automation, support analytics, and AI-assisted workflows.
+The project also fits into my broader work across data analysis, automation, technical support, and AI-assisted workflows.
+
+---
+
+🔗 Technologies
+
+"Python" "FAISS" "Sentence Transformers" "Gemini" "RAG" "Semantic Search" "Embeddings" "LLMs" "Information Retrieval"
